@@ -1,0 +1,84 @@
+import {StyleSheet, Text, View} from 'react-native';
+import {ProgressBar} from 'react-native-paper';
+import {Colors} from '../../Assets/Colors';
+import {useEffect, useState} from 'react';
+
+const WorkingZone = () => {
+  // simular una variacion de frecuencia cardiaca
+  const [heartRate, setHeartRate] = useState(72); // Estado para la frecuencia cardiaca
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simular un cambio en la frecuencia cardiaca
+      const randomChange = Math.floor(Math.random() * 6) - 5; // Cambia entre -2 y +2
+      console.log(randomChange);
+      const newHeartR = heartRate + randomChange;
+      console.log(`Frecuencia cardiaca: ${newHeartR} BPM`);
+      setHeartRate(newHeartR < 60 ? 60 : newHeartR); // Asegúrate de que no baje de 60
+    }, 1000); // Cambia cada segundo
+
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
+  }, []);
+
+  // estimar zona de trabajo
+  const edad = 19;
+  const fcMax = 208 - 0.7 * edad; // FCmáx ≈ 194.7
+
+  const porcentajeFC = (heartRate / fcMax) * 100;
+
+  let zona = '';
+  if (porcentajeFC < 70) {
+    zona = 'Zona 1: Muy ligera';
+  } else if (porcentajeFC < 85) {
+    zona = 'Zona 2: Moderada';
+  } else {
+    zona = 'Zona 3: Intensa';
+  }
+
+  console.log(`Zona de trabajo: ${porcentajeFC}`);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.TextContainer}>
+        <Text style={styles.text}> {heartRate} BPM</Text>
+      </View>
+      <ProgressBar
+        progress={porcentajeFC / 100}
+        color={Colors.textPrimary}
+        style={styles.progressBar}
+      />
+      <Text
+        style={{color: Colors.textSecondary, marginTop: 10, paddingLeft: 10}}>
+        {zona}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginVertical: 20,
+  },
+  progressBar: {
+    width: '100%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'gray',
+  },
+  TextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    paddingLeft: 5,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: Colors.textPrimary,
+  },
+});
+
+export default WorkingZone;
