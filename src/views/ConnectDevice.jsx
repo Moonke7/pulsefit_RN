@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {BleManager} from 'react-native-ble-plx';
-import {Colors} from '../Assets/Colors';
+import {Colors} from '../assets/Colors';
 import Header from '../components/Header';
 import {Snackbar} from 'react-native-paper';
 
@@ -20,6 +20,11 @@ const ConnectDevice = () => {
   const [connectedDevice, setConnectedDevice] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [mensaje, setMensaje] = useState('Conectando...');
+  const [receivedData, setReceivedData] = useState('');
+
+  console.log('Dispositivos encontrados:', devices);
+  console.log('Dispositivo conectado:', connectedDevice);
+  console.log('data recibida:', receivedData);
 
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -76,7 +81,7 @@ const ConnectDevice = () => {
       }
       // Filtra por dispositivos cuyo nombre contenga "ESP32"
       setDevices(prevDevices => {
-        if (!prevDevices.some(d => d.id === device.id)) {
+        if (!prevDevices.some(d => d.id === device.id) && device.name) {
           return [...prevDevices, device];
         }
         return prevDevices;
@@ -98,10 +103,35 @@ const ConnectDevice = () => {
       setConnectedDevice(connected);
       setIsConnecting(false);
       console.log('Conectado a:', connected.name);
+      setupNotifications(connected);
     } catch (error) {
       console.error('Error al conectar:', error);
       setIsConnecting(true);
       setMensaje('Error al conectar al dispositivo', error.message);
+    }
+  };
+
+  const setupNotifications = async device => {
+    const services = await device.services();
+    for (const service of services) {
+      const characteristics = await service.characteristics();
+      for (const char of characteristics) {
+        if (char.isNotifiable) {
+          char.monitor((error, characteristic) => {
+            if (error) {
+              console.error('Error al monitorear:', error);
+              return;
+            }
+
+            const value = characteristic?.value;
+            if (value) {
+              const decoded = atob(value); // Base64 a texto
+              console.log('Dato recibido:', decoded);
+              setReceivedData(prev => prev + '\n' + decoded); // mostrarlo
+            }
+          });
+        }
+      }
     }
   };
 
@@ -157,7 +187,6 @@ const ConnectDevice = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
     backgroundColor: Colors.background,
   },
   title: {

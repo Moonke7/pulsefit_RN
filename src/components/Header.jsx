@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
-import { Colors } from "../Assets/Colors";
+import { Colors } from "../assets/Colors";
 
 const Header = ({ title }) => {
   return (
@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    height: 70,
+    height: 50,
     width: "100%",
     paddingHorizontal: 20,
-    paddingTop: 10,
+    marginTop: 40,
   },
   title: {
     fontSize: 20,

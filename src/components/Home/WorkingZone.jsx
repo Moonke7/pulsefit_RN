@@ -1,27 +1,31 @@
 import {StyleSheet, Text, View} from 'react-native';
 import {ProgressBar} from 'react-native-paper';
-import {Colors} from '../../Assets/Colors';
-import {useEffect, useState} from 'react';
+import {Colors} from '../../assets/Colors';
+import React, {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
-const WorkingZone = () => {
+const WorkingZone = ({heartRate}) => {
   // simular una variacion de frecuencia cardiaca
-  const [heartRate, setHeartRate] = useState(72); // Estado para la frecuencia cardiaca
+  const [edad, setEdad] = useState(19); // Estado para la edad
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Simular un cambio en la frecuencia cardiaca
-      const randomChange = Math.floor(Math.random() * 6) - 5; // Cambia entre -2 y +2
-      console.log(randomChange);
-      const newHeartR = heartRate + randomChange;
-      console.log(`Frecuencia cardiaca: ${newHeartR} BPM`);
-      setHeartRate(newHeartR < 60 ? 60 : newHeartR); // Asegúrate de que no baje de 60
-    }, 1000); // Cambia cada segundo
-
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getData = async () => {
+        try {
+          const storedEdad = await AsyncStorage.getItem('user_age');
+          if (storedEdad) {
+            setEdad(parseInt(storedEdad, 10)); // Convierte a número entero
+          }
+        } catch (error) {
+          console.error('Error al obtener datos de AsyncStorage:', error);
+        }
+      };
+      getData();
+    }, [])
+  );
 
   // estimar zona de trabajo
-  const edad = 19;
   const fcMax = 208 - 0.7 * edad; // FCmáx ≈ 194.7
 
   const porcentajeFC = (heartRate / fcMax) * 100;
@@ -35,7 +39,7 @@ const WorkingZone = () => {
     zona = 'Zona 3: Intensa';
   }
 
-  console.log(`Zona de trabajo: ${porcentajeFC}`);
+  //console.log(`Zona de trabajo: ${porcentajeFC}`);
 
   return (
     <View style={styles.container}>

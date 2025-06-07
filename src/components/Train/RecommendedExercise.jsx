@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import { Colors } from "../../Assets/Colors";
+import { Colors } from "../../assets/Colors";
 
 const RecommendedExercise = ({ img, type, details }) => {
   return (

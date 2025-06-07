@@ -5,7 +5,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import {Colors} from '../../Assets/Colors';
+import {Colors} from '../../assets/Colors';
 import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
 
 const Setting = ({title, actual, setChangeType}) => {

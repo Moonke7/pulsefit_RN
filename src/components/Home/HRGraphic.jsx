@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native"; // Importa Dimensions para obtener el ancho de la pantalla
-import { Colors } from "../../Assets/Colors";
+import { Colors } from "../../assets/Colors";
 
-const HRGraphic = () => {
+const HRGraphic = ({heartRate}) => {
   const data = {
     labels: ["6 AM", "9 AM", "12 PM", "3 PM", "6 PM", "9 PM"],
     datasets: [
@@ -22,7 +22,7 @@ const HRGraphic = () => {
       <View style={{}}>
         <Text style={[styles.text, {paddingBottom: 0}]}> Ritmo cardiaco</Text>
         <Text style={[styles.text, { fontSize: 26, fontWeight: "500", paddingTop: 0 }]}>
-          80 BPM prom.
+          {heartRate} BPM prom.
         </Text>
       </View>
 

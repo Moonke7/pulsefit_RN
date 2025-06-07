@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   View,
@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import {Colors} from '../../Assets/Colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '../../assets/Colors';
 
-const ChangeSettings = ({visible, message, type, onClose}) => {
+const ChangeSettings = ({ visible, message, type, onClose }) => {
   const [text, setText] = useState('');
 
   const getTypePlaceholder = () => {
@@ -22,31 +23,56 @@ const ChangeSettings = ({visible, message, type, onClose}) => {
         return 'Ingrese su altura';
       case 'Edad':
         return 'Ingrese su edad';
+      default:
+        return 'Ingrese un valor';
     }
   };
 
-  const SaveData = () => {
-    // Aquí puedes agregar la lógica para guardar los datos ingresados
-    console.log(`Guardando ${type}: ${text}`);
-    // Luego cierra el modal
+  const getStorageKey = () => {
+    switch (type) {
+      case 'Nombre':
+        return 'username';
+      case 'Peso':
+        return 'user_weight';
+      case 'Altura':
+        return 'user_height';
+      case 'Edad':
+        return 'user_age';
+      default:
+        return 'user_data';
+    }
+  };
+
+  const SaveData = async () => {
+    const key = getStorageKey();
+    try {
+      await AsyncStorage.setItem(key, text);
+      console.log(`Guardado ${type}: ${text} en AsyncStorage con clave ${key}`);
+      setText(''); // Limpiar el campo de texto después de guardar
+    } catch (error) {
+      console.error('Error al guardar en AsyncStorage:', error);
+    }
     onClose();
-  }
+  };
 
   return (
     <Modal
       transparent={true}
       visible={visible}
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={[styles.modalContainer]}>
           <Text style={styles.message}>{message}</Text>
           <TextInput
             style={styles.input}
-            placeholder={getTypePlaceholder()} // Set placeholder based on type
-            placeholderTextColor={Colors.textSecondary} // Placeholder color
-            keyboardType={type === 'nombre' ? 'default' : 'numeric'} // Set keyboard type based on type
-            onChangeText={text => setText(text)} // Handle input change
+            placeholder={getTypePlaceholder()}
+            placeholderTextColor={Colors.textSecondary}
+            keyboardType={
+              type === 'Nombre' || type === 'Altura' ? 'default' : 'numeric'
+            }
+            onChangeText={setText}
             value={text}
           />
 
@@ -54,7 +80,7 @@ const ChangeSettings = ({visible, message, type, onClose}) => {
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity onPress={SaveData} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Guardar</Text>
             </TouchableOpacity>
           </View>
